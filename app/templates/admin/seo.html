@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% block title %}SEO — {{ client.business_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">{{ client.business_name }}</div>
+  <div class="page-title">SEO</div>
+</div>
+<div class="module-nav">
+  <a href="/clients/{{ client.id }}" class="module-btn">← Overview</a>
+  <a href="/clients/{{ client.id }}/social" class="module-btn">◉ Social</a>
+  <a href="/clients/{{ client.id }}/seo" class="module-btn active">⊕ SEO</a>
+  <a href="/clients/{{ client.id }}/ads" class="module-btn">◎ Ads</a>
+  <a href="/clients/{{ client.id }}/website" class="module-btn">⊡ Website</a>
+</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-title">Keyword Research</div>
+    <form method="POST" action="/clients/{{ client.id }}/seo/keywords/generate">
+      <label>Seed Keywords (optional)</label>
+      <input type="text" name="seed_keywords" placeholder="e.g. Europe tour, honeymoon package, budget travel">
+      <button type="submit" class="btn">Generate Keywords ✦</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="card-title">Page Audit</div>
+    <form method="POST" action="/clients/{{ client.id }}/seo/pages/audit">
+      <label>Page URL</label><input type="url" name="url" required placeholder="https://example.com/page">
+      <label>Current Title</label><input type="text" name="current_title">
+      <label>Current Meta Description</label><input type="text" name="current_meta">
+      <label>Page Content (paste key text)</label><textarea name="page_content" style="min-height:80px;"></textarea>
+      <button type="submit" class="btn">Audit Page ✦</button>
+    </form>
+  </div>
+</div>
+
+{% if keywords %}
+<div class="card">
+  <div class="card-title">Keywords ({{ keywords|length }})</div>
+  <table>
+    <thead><tr><th>Keyword</th><th>Intent</th><th>Cluster</th><th>Priority</th></tr></thead>
+    <tbody>
+    {% for kw in keywords %}
+    <tr>
+      <td style="font-weight:500;">{{ kw.keyword }}</td>
+      <td style="color:var(--muted);">{{ kw.intent }}</td>
+      <td style="color:var(--muted);">{{ kw.cluster }}</td>
+      <td><span class="badge badge-{{ kw.priority }}">{{ kw.priority }}</span></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if pages %}
+<div class="card">
+  <div class="card-title">Audited Pages ({{ pages|length }})</div>
+  {% for page in pages %}
+  <div style="padding:16px 0;border-bottom:1px solid var(--line);">
+    <div style="font-size:13px;color:var(--teal);margin-bottom:6px;">{{ page.url }}</div>
+    {% if page.suggested_title %}
+    <div class="grid-2">
+      <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">SUGGESTED TITLE</div><div style="font-size:14px;">{{ page.suggested_title }}</div></div>
+      <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">SUGGESTED META</div><div style="font-size:13px;color:var(--muted);">{{ page.suggested_meta }}</div></div>
+    </div>
+    {% endif %}
+    {% if page.issues %}
+    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+      {% for issue in page.issues %}<span class="badge badge-high">{{ issue }}</span>{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

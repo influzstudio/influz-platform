@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard — Influz Studio{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Agency Dashboard</div>
+  <div class="page-title">Welcome back, {{ admin.name.split()[0] }}</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Active Clients</div><div class="stat-value">{{ stats.total_clients }}</div></div>
+  <div class="stat-card"><div class="stat-label">Total Posts</div><div class="stat-value">{{ stats.total_posts }}</div></div>
+  <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-value">{{ stats.total_leads }}</div></div>
+  <div class="stat-card"><div class="stat-label">Pending Tasks</div><div class="stat-value" style="color:var(--amber)">{{ stats.total_tasks }}</div></div>
+</div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+  <div style="font-size:16px;font-weight:600;">Clients</div>
+  <a href="/clients/new" class="btn btn-sm">+ New Client</a>
+</div>
+
+{% if clients %}
+<div class="grid-2">
+{% for c in clients %}
+<a href="/clients/{{ c.id }}" class="client-card">
+  <div class="client-name">{{ c.business_name }}</div>
+  <div class="client-meta">{{ c.industry }} · {{ c.city }}</div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+    {% for goal in c.goals or [] %}
+    <span class="badge badge-approved">{{ goal }}</span>
+    {% endfor %}
+  </div>
+</a>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty">
+  <h3>No clients yet</h3>
+  <p style="margin-bottom:20px">Add your first client to get started</p>
+  <a href="/clients/new" class="btn">+ Add Client</a>
+</div>
+{% endif %}
+{% endblock %}

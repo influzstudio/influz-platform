@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% block title %}Ads — {{ client.business_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">{{ client.business_name }}</div>
+  <div class="page-title">Ads & Lead Generation</div>
+</div>
+<div class="module-nav">
+  <a href="/clients/{{ client.id }}" class="module-btn">← Overview</a>
+  <a href="/clients/{{ client.id }}/social" class="module-btn">◉ Social</a>
+  <a href="/clients/{{ client.id }}/seo" class="module-btn">⊕ SEO</a>
+  <a href="/clients/{{ client.id }}/ads" class="module-btn active">◎ Ads</a>
+  <a href="/clients/{{ client.id }}/website" class="module-btn">⊡ Website</a>
+</div>
+<div class="card">
+  <div class="card-title">Generate Campaign + Ad Copy</div>
+  <form method="POST" action="/clients/{{ client.id }}/ads/campaigns/generate">
+    <div class="grid-3">
+      <div><label>Platform</label>
+        <select name="platform"><option value="meta">Meta (FB/IG)</option><option value="google">Google</option></select></div>
+      <div><label>Campaign Type</label>
+        <select name="campaign_type"><option value="leads">Lead Generation</option><option value="awareness">Brand Awareness</option><option value="retargeting">Retargeting</option><option value="sales">Sales</option></select></div>
+      <div><label>Daily Budget (₹)</label><input type="number" name="budget_daily" value="500" style="margin:0;"></div>
+    </div>
+    <label>Campaign Objective / Offer</label>
+    <input type="text" name="objective" placeholder="e.g. Get leads for Europe tour package — starting ₹45,000">
+    <button type="submit" class="btn">Generate Campaign ✦</button>
+  </form>
+</div>
+
+{% if campaigns %}
+{% for campaign in campaigns %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+    <div>
+      <div style="font-weight:600;font-size:15px;">{{ campaign.name }}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;">₹{{ campaign.budget_daily }}/day · {{ campaign.platform }} · <span class="badge badge-{{ campaign.status }}">{{ campaign.status }}</span></div>
+    </div>
+    <div style="text-align:right;font-size:13px;color:var(--muted);">
+      <div>Spend: ₹{{ campaign.spend }}</div>
+      <div>Leads: {{ campaign.conversions }}</div>
+    </div>
+  </div>
+  {% for asset in campaign.assets %}
+  <div style="background:var(--bg3);border-radius:6px;padding:16px;margin-bottom:10px;">
+    <div style="font-weight:600;color:var(--ink);margin-bottom:6px;">{{ asset.headline }}</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">{{ asset.description }}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="badge badge-approved">CTA: {{ asset.cta }}</span>
+      {% if asset.creative_brief %}<span style="font-size:12px;color:var(--muted);">Brief: {{ asset.creative_brief[:60] }}</span>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endfor %}
+{% endif %}
+
+{% if leads %}
+<div class="card">
+  <div class="card-title">Recent Leads ({{ leads|length }})</div>
+  <table>
+    <thead><tr><th>Name</th><th>Source</th><th>Interest</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+    <tbody>
+    {% for lead in leads %}
+    <tr>
+      <td style="font-weight:500;">{{ lead.name or "—" }}<div style="font-size:12px;color:var(--muted);">{{ lead.email }}</div></td>
+      <td style="color:var(--muted);">{{ lead.source }}</td>
+      <td style="color:var(--muted);">{{ lead.interest[:30] if lead.interest else "—" }}</td>
+      <td><span class="badge badge-{{ lead.priority }}">{{ lead.priority }}</span></td>
+      <td><span class="badge badge-draft">{{ lead.status }}</span></td>
+      <td style="color:var(--muted);font-size:12px;">{{ lead.created_at.strftime('%d %b') if lead.created_at else "—" }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

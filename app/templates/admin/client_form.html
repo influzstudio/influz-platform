@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}New Client — Influz Studio{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">Clients</div>
+  <div class="page-title">New Client</div>
+</div>
+<div class="card" style="max-width:640px;">
+  <form method="POST" action="/clients/new">
+    <div class="grid-2">
+      <div><label>Business Name</label><input type="text" name="business_name" required placeholder="e.g. Wanderlust Travels"></div>
+      <div><label>Industry / Niche</label><input type="text" name="industry" required placeholder="e.g. Travel, LED Lighting, Finance"></div>
+    </div>
+    <label>Website URL</label><input type="url" name="website_url" placeholder="https://example.com">
+    <label>Brand Voice</label><input type="text" name="brand_voice" required placeholder="e.g. adventurous, trustworthy, premium">
+    <label>USP (Unique Selling Proposition)</label>
+    <textarea name="usp" placeholder="What makes this business unique?"></textarea>
+    <label>Goals</label>
+    <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
+      {% for g in ["leads","awareness","sales","engagement","seo"] %}
+      <label style="display:flex;align-items:center;gap:6px;color:var(--ink);font-size:14px;margin-bottom:0;">
+        <input type="checkbox" name="goals" value="{{ g }}" style="width:auto;margin:0;"> {{ g.title() }}
+      </label>
+      {% endfor %}
+    </div>
+    <label>City</label><input type="text" name="city" placeholder="e.g. Mumbai, Delhi, Noida">
+    <button type="submit" class="btn">Create Client →</button>
+  </form>
+</div>
+{% endblock %}

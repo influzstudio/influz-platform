@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Influz Studio{% endblock %}</title>
+<style>
+  :root {
+    --bg: #0E1822; --bg2: #13202E; --bg3: #1A2B3C;
+    --teal: #2DD4BF; --mint: #A7E8DC; --muted: #7E8FA0;
+    --ink: #F4F7F6; --line: rgba(45,212,191,0.15);
+    --red: #F87171; --amber: #FBBF24; --purple: #A78BFA; --green: #34D399;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--ink); font-family:'Inter',system-ui,sans-serif; font-size:15px; display:flex; min-height:100vh; }
+
+  /* Sidebar */
+  .sidebar { width:240px; background:var(--bg2); border-right:1px solid var(--line); display:flex; flex-direction:column; position:fixed; height:100vh; overflow-y:auto; }
+  .sidebar-logo { padding:24px 20px; border-bottom:1px solid var(--line); }
+  .sidebar-logo .brand { font-size:18px; font-weight:700; color:var(--teal); letter-spacing:0.5px; }
+  .sidebar-logo .tagline { font-size:11px; color:var(--muted); margin-top:2px; }
+  .sidebar-nav { flex:1; padding:16px 0; }
+  .nav-section { padding:8px 20px 4px; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+  .nav-link { display:flex; align-items:center; gap:10px; padding:10px 20px; color:var(--muted); text-decoration:none; font-size:14px; transition:all 0.15s; border-left:3px solid transparent; }
+  .nav-link:hover, .nav-link.active { color:var(--ink); background:rgba(45,212,191,0.07); border-left-color:var(--teal); }
+  .nav-link .icon { width:18px; text-align:center; font-size:15px; }
+  .sidebar-footer { padding:16px 20px; border-top:1px solid var(--line); }
+  .admin-badge { font-size:12px; color:var(--muted); }
+  .admin-name { font-size:14px; font-weight:500; color:var(--ink); }
+
+  /* Main */
+  .main { margin-left:240px; flex:1; padding:32px; min-height:100vh; }
+  .page-header { margin-bottom:28px; }
+  .eyebrow { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--teal); margin-bottom:6px; }
+  .page-title { font-size:26px; font-weight:700; color:var(--ink); }
+
+  /* Cards */
+  .card { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:24px; margin-bottom:16px; }
+  .card-title { font-size:13px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }
+
+  /* Stats grid */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+  .stat-card { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:20px; }
+  .stat-label { font-size:12px; color:var(--muted); margin-bottom:8px; }
+  .stat-value { font-size:28px; font-weight:700; color:var(--teal); }
+  .stat-sub { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  /* Module nav */
+  .module-nav { display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
+  .module-btn { padding:9px 18px; border-radius:6px; font-size:13px; font-weight:500; text-decoration:none; border:1px solid var(--line); color:var(--muted); transition:all 0.15s; }
+  .module-btn:hover, .module-btn.active { background:var(--teal); color:var(--bg); border-color:var(--teal); }
+
+  /* Buttons */
+  .btn { background:var(--teal); color:var(--bg); border:none; padding:10px 20px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; transition:opacity 0.15s; }
+  .btn:hover { opacity:0.85; }
+  .btn-sm { padding:6px 14px; font-size:13px; }
+  .btn-ghost { background:transparent; border:1px solid var(--line); color:var(--muted); }
+  .btn-ghost:hover { border-color:var(--teal); color:var(--teal); background:transparent; }
+  .btn-red { background:var(--red); color:#fff; }
+
+  /* Forms */
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500; letter-spacing:0.3px; }
+  input, select, textarea { width:100%; background:var(--bg3); border:1px solid var(--line); border-radius:6px; padding:10px 14px; color:var(--ink); font-size:14px; margin-bottom:16px; font-family:inherit; }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--teal); }
+  textarea { min-height:100px; resize:vertical; }
+
+  /* Table */
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); padding:10px 16px; border-bottom:1px solid var(--line); }
+  td { padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px; vertical-align:middle; }
+  tr:hover td { background:rgba(45,212,191,0.03); }
+
+  /* Badges */
+  .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .badge-draft { background:rgba(126,143,160,0.2); color:var(--muted); }
+  .badge-approved { background:rgba(45,212,191,0.2); color:var(--teal); }
+  .badge-posted { background:rgba(52,211,153,0.2); color:var(--green); }
+  .badge-failed { background:rgba(248,113,113,0.2); color:var(--red); }
+  .badge-high { background:rgba(248,113,113,0.2); color:var(--red); }
+  .badge-medium { background:rgba(251,191,36,0.2); color:var(--amber); }
+  .badge-low { background:rgba(167,139,250,0.2); color:var(--purple); }
+
+  /* Grid */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+
+  /* Client list */
+  .client-card { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:20px; text-decoration:none; display:block; transition:border-color 0.15s; }
+  .client-card:hover { border-color:var(--teal); }
+  .client-name { font-size:16px; font-weight:600; color:var(--ink); margin-bottom:4px; }
+  .client-meta { font-size:13px; color:var(--muted); }
+
+  /* Empty state */
+  .empty { text-align:center; padding:60px 20px; color:var(--muted); }
+  .empty h3 { font-size:18px; margin-bottom:8px; color:var(--ink); }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">Influz Studio</div>
+    <div class="tagline">Marketing OS</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Platform</div>
+    <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+      <span class="icon">⊞</span> Dashboard
+    </a>
+    <a href="#" class="nav-link">
+      <span class="icon">◎</span> All Clients
+    </a>
+
+    {% if client is defined and client %}
+    <div class="nav-section" style="margin-top:16px;">{{ client.business_name }}</div>
+    <a href="/clients/{{ client.id }}" class="nav-link {% if 'overview' in request.url.path or request.url.path == '/clients/'~client.id %}active{% endif %}">
+      <span class="icon">◈</span> Overview
+    </a>
+    <a href="/clients/{{ client.id }}/social" class="nav-link {% if '/social' in request.url.path %}active{% endif %}">
+      <span class="icon">◉</span> Social Media
+    </a>
+    <a href="/clients/{{ client.id }}/seo" class="nav-link {% if '/seo' in request.url.path %}active{% endif %}">
+      <span class="icon">⊕</span> SEO
+    </a>
+    <a href="/clients/{{ client.id }}/ads" class="nav-link {% if '/ads' in request.url.path %}active{% endif %}">
+      <span class="icon">◎</span> Ads
+    </a>
+    <a href="/clients/{{ client.id }}/website" class="nav-link {% if '/website' in request.url.path %}active{% endif %}">
+      <span class="icon">⊡</span> Website
+    </a>
+    <a href="/clients/{{ client.id }}/reports" class="nav-link {% if '/reports' in request.url.path %}active{% endif %}">
+      <span class="icon">◱</span> Reports
+    </a>
+    {% endif %}
+  </nav>
+  <div class="sidebar-footer">
+    {% if admin is defined %}
+    <div class="admin-name">{{ admin.name }}</div>
+    <div class="admin-badge">Admin</div>
+    {% endif %}
+    <a href="/logout" style="font-size:12px;color:var(--muted);text-decoration:none;display:block;margin-top:8px;">Sign out →</a>
+  </div>
+</aside>
+
+<main class="main">
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

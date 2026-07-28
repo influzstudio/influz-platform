@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% block title %}Reports — {{ client.business_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">{{ client.business_name }}</div>
+  <div class="page-title">Monthly Reports</div>
+</div>
+<div class="module-nav">
+  <a href="/clients/{{ client.id }}" class="module-btn">← Overview</a>
+  <a href="/clients/{{ client.id }}/social" class="module-btn">◉ Social</a>
+  <a href="/clients/{{ client.id }}/seo" class="module-btn">⊕ SEO</a>
+  <a href="/clients/{{ client.id }}/ads" class="module-btn">◎ Ads</a>
+  <a href="/clients/{{ client.id }}/reports" class="module-btn active">◱ Reports</a>
+</div>
+<div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+  <form method="POST" action="/clients/{{ client.id }}/reports/generate">
+    <button type="submit" class="btn">Generate This Month's Report ✦</button>
+  </form>
+</div>
+{% if reports %}
+{% for report in reports %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <div style="font-size:18px;font-weight:700;">{{ report.report_month }}</div>
+    <div style="font-size:12px;color:var(--muted);">Generated {{ report.created_at.strftime('%d %b %Y') if report.created_at else "" }}</div>
+  </div>
+  {% if report.overall_summary %}
+  <div style="background:var(--bg3);border-radius:6px;padding:16px;margin-bottom:16px;border-left:3px solid var(--teal);">
+    <div style="font-size:12px;color:var(--teal);margin-bottom:6px;">OVERALL SUMMARY</div>
+    <div style="font-size:14px;line-height:1.6;">{{ report.overall_summary }}</div>
+  </div>
+  {% endif %}
+  <div class="grid-3" style="margin-bottom:16px;">
+    {% for module, summary in [("Social", report.social_summary), ("Ads", report.ads_summary), ("SEO", report.seo_summary)] %}
+    <div style="background:var(--bg3);border-radius:6px;padding:14px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">{{ module.upper() }}</div>
+      <div style="font-size:13px;line-height:1.5;">{{ summary or "No data" }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if report.next_actions %}
+  <div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">NEXT ACTIONS</div>
+    {% for action in report.next_actions %}
+    <div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;font-size:13px;">
+      <span style="color:var(--teal);margin-top:2px;">→</span> {{ action }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div class="empty"><h3>No reports yet</h3><p>Generate your first monthly report above</p></div>
+{% endif %}
+{% endblock %}

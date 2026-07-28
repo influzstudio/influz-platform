@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+{% block title %}Website — {{ client.business_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="eyebrow">{{ client.business_name }}</div>
+  <div class="page-title">Website UX & CRO</div>
+</div>
+<div class="module-nav">
+  <a href="/clients/{{ client.id }}" class="module-btn">← Overview</a>
+  <a href="/clients/{{ client.id }}/social" class="module-btn">◉ Social</a>
+  <a href="/clients/{{ client.id }}/seo" class="module-btn">⊕ SEO</a>
+  <a href="/clients/{{ client.id }}/ads" class="module-btn">◎ Ads</a>
+  <a href="/clients/{{ client.id }}/website" class="module-btn active">⊡ Website</a>
+</div>
+<div class="card">
+  <div class="card-title">Page UX Audit</div>
+  <form method="POST" action="/clients/{{ client.id }}/website/audit">
+    <label>Page URL</label><input type="url" name="url" required placeholder="https://example.com">
+    <label>Paste key page content (headings, CTAs, main text)</label>
+    <textarea name="page_content" style="min-height:140px;" placeholder="Paste the main text content of the page..."></textarea>
+    <button type="submit" class="btn">Audit Page ✦</button>
+  </form>
+</div>
+{% if pages %}
+{% for page in pages %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div style="color:var(--teal);font-size:14px;">{{ page.url }}</div>
+    <div style="font-size:24px;font-weight:700;color:{% if page.ux_score >= 7 %}var(--green){% elif page.ux_score >= 5 %}var(--amber){% else %}var(--red){% endif %};">{{ page.ux_score }}/10</div>
+  </div>
+  {% if page.issues %}
+  <div style="margin-bottom:16px;">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">ISSUES FOUND</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      {% for issue in page.issues %}<span class="badge badge-high">{{ issue }}</span>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% for rec in page.recommendations_list %}
+  <div style="background:var(--bg3);border-radius:6px;padding:16px;margin-bottom:10px;border-left:3px solid {% if rec.priority=='high' %}var(--red){% elif rec.priority=='medium' %}var(--amber){% else %}var(--teal){% endif %};">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-weight:600;">{{ rec.title }}</div>
+      <span class="badge badge-{{ rec.priority }}">{{ rec.priority }}</span>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">{{ rec.description }}</div>
+    {% if rec.before_text and rec.after_text %}
+    <div class="grid-2" style="gap:10px;">
+      <div style="background:rgba(248,113,113,0.1);border-radius:4px;padding:10px;font-size:12px;"><div style="color:var(--red);margin-bottom:4px;">BEFORE</div>{{ rec.before_text }}</div>
+      <div style="background:rgba(45,212,191,0.1);border-radius:4px;padding:10px;font-size:12px;"><div style="color:var(--teal);margin-bottom:4px;">AFTER</div>{{ rec.after_text }}</div>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endfor %}
+{% else %}
+<div class="empty"><h3>No pages audited yet</h3><p>Paste a page URL and content above to get AI-powered UX recommendations</p></div>
+{% endif %}
+{% endblock %}
