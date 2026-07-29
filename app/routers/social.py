@@ -97,3 +97,32 @@ def delete_post(request: Request, client_id: int, post_id: int, db: Session = De
     db.delete(post)
     db.commit()
     return RedirectResponse(f"/clients/{client_id}/social", status_code=303)
+
+
+@router.post("/{post_id}/update")
+def update_post(
+    request: Request, client_id: int, post_id: int,
+    post_date: str = Form(...),
+    post_type: str = Form(...),
+    platforms: list[str] = Form([]),
+    topic: str = Form(""),
+    cover_text: str = Form(""),
+    image_text: str = Form(""),
+    caption: str = Form(""),
+    reference_note: str = Form(""),
+    client_feedback: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    post = db.query(SocialPost).filter(SocialPost.id == post_id).first()
+    if not post: raise HTTPException(404)
+    post.post_date = datetime.strptime(post_date, "%Y-%m-%d").date()
+    post.post_type = post_type
+    post.platforms = platforms
+    post.topic = topic
+    post.cover_text = cover_text
+    post.image_text = image_text
+    post.caption = caption
+    post.reference_note = reference_note
+    post.client_feedback = client_feedback
+    db.commit()
+    return RedirectResponse(f"/clients/{client_id}/social", status_code=303)
