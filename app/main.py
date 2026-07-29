@@ -27,6 +27,8 @@ init_db()
 
 app = FastAPI(title="Influz Studio Platform")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("APP_SECRET_KEY", "influz-secret-2026"))
+import os as _os
+_os.makedirs("app/static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 templates = Jinja2Templates(directory="app/templates")
