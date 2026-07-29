@@ -1,7 +1,6 @@
 import os, json, re
-import anthropic
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
 
 def audit_page(url, content, business_name, industry):
     if not os.getenv("ANTHROPIC_API_KEY"):
@@ -11,6 +10,8 @@ def audit_page(url, content, business_name, industry):
                 "title": "Add clear CTA", "description": "Add a prominent call-to-action button",
                 "before": "Contact us", "after": "Book Free Consultation →"}]}
     try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         resp = client.messages.create(model="claude-sonnet-4-6", max_tokens=3000,
             messages=[{"role": "user", "content": f"""Audit this webpage for UX and conversion:
 URL: {url} | Business: {business_name} | Industry: {industry}
