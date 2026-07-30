@@ -21,7 +21,7 @@ def call_ai(prompt: str, max_tokens: int = 3000) -> str:
     if gemini_key:
         import requests
         resp = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}",
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_key}",
             json={"contents": [{"parts": [{"text": prompt}]}],
                   "generationConfig": {"maxOutputTokens": max_tokens}},
             timeout=60
