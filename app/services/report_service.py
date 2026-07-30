@@ -1,3 +1,4 @@
+from app.services.ai_base import call_ai
 import os, json, re
 
 
@@ -18,7 +19,7 @@ Stats: {total_posts} social posts, {total_leads} leads this month
 
 Return JSON: {{"social_summary": str, "ads_summary": str, "seo_summary": str,
 "overall_summary": str, "next_actions": [str]}}"""}])
-        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", resp.content[0].text.strip())
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
         return json.loads(raw)
     except:
         return {"social_summary": "", "ads_summary": "", "seo_summary": "",

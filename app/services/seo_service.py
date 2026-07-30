@@ -1,3 +1,4 @@
+from app.services.ai_base import call_ai
 import os, json, re
 
 
@@ -13,7 +14,7 @@ def generate_keyword_clusters(business_name, industry, city, seed_keywords=""):
 Business: {business_name} | Industry: {industry} | City: {city} | Seeds: {seed_keywords}
 
 Return ONLY JSON array: [{{"keyword": str, "intent": "informational|transactional|navigational", "cluster": str, "priority": "high|medium|low"}}]"""}])
-        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", resp.content[0].text.strip())
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
         return json.loads(raw)
     except:
         return []
@@ -32,7 +33,7 @@ Current title: {current_title} | Current meta: {current_meta}
 Content: {page_content[:1000]}
 
 Return JSON: {{"suggested_title": str, "suggested_meta": str, "suggested_h1": str, "suggested_schema": str, "issues": [str]}}"""}])
-        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", resp.content[0].text.strip())
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
         return json.loads(raw)
     except:
         return {"suggested_title": "", "suggested_meta": "", "suggested_h1": "", "suggested_schema": "", "issues": []}

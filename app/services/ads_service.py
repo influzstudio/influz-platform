@@ -1,3 +1,4 @@
+from app.services.ai_base import call_ai
 import os, json, re
 
 
@@ -15,7 +16,7 @@ Business: {business_name} | Industry: {industry} | Platform: {platform}
 Campaign type: {campaign_type} | Objective: {objective} | Voice: {brand_voice}
 
 Return JSON: {{"assets": [{{"headline": str, "description": str, "cta": str, "creative_brief": str}}]}}"""}])
-        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", resp.content[0].text.strip())
+        raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw)
         return json.loads(raw)
     except:
         return {"assets": []}
