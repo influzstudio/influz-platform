@@ -1,32 +1,21 @@
-import os, json, re
+import os
 
 
 def call_ai(prompt: str, max_tokens: int = 3000) -> str:
-    """Universal AI caller — Anthropic first, Gemini fallback."""
-    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
-    if anthropic_key:
+    ak = os.getenv("ANTHROPIC_API_KEY")
+    if ak:
         try:
             import anthropic
-            client = anthropic.Anthropic(api_key=anthropic_key)
-            resp = client.messages.create(
-                model="claude-sonnet-4-6", max_tokens=max_tokens,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            return resp.content[0].text.strip()
+            c = anthropic.Anthropic(api_key=ak)
+            r = c.messages.create(model="claude-sonnet-4-6", max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}])
+            return r.content[0].text.strip()
         except Exception as e:
-            if "credit" not in str(e).lower() and "balance" not in str(e).lower():
-                raise
+            if "credit" not in str(e).lower(): raise
 
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    if gemini_key:
-        import requests
-        resp = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_key}",
-            json={"contents": [{"parts": [{"text": prompt}]}],
-                  "generationConfig": {"maxOutputTokens": max_tokens}},
-            timeout=60
-        )
-        resp.raise_for_status()
-        return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+    if os.getenv("GEMINI_API_KEY"):
+        import google.genai as genai
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        return client.models.generate_content(model="gemini-2.0-flash", contents=prompt).text.strip()
 
     raise Exception("No AI API key available")
