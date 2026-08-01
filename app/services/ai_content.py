@@ -51,6 +51,17 @@ All content must be specific to {business_name} and {niche}. No placeholders."""
         except Exception as e:
             print(f"Gemini error: {e}")
 
+    # Try Groq (free)
+    if os.getenv("GROQ_API_KEY"):
+        try:
+            from app.services.ai_base import call_ai_groq
+            raw = call_ai_groq(prompt)
+            raw = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
+            items = json.loads(raw)
+            if isinstance(items, list) and items: return items[:num_posts]
+        except Exception as e:
+            print(f"Groq error: {e}")
+
     return _fallback(start_date, num_posts, business_name)
 
 
