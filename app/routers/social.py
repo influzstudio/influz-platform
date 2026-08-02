@@ -47,36 +47,45 @@ def generate_social_calendar(
     client = db.query(Client).filter(Client.id == client_id).first()
     if not client: raise HTTPException(404)
 
-    from app.services.ai_content import generate_social_calendar
     start = datetime.strptime(start_date, "%Y-%m-%d").date() if start_date else date.today()
 
     # Clear existing drafts
     db.query(SocialPost).filter(SocialPost.client_id == client_id, SocialPost.status == "draft").delete()
     db.commit()
 
-    items = generate_social_calendar(
-        business_name=client.business_name,
-        niche=client.industry,
-        brand_voice=client.brand_voice,
-        goals=", ".join(client.goals or []),
-        city=client.city,
-        start_date=start,
-        num_posts=num_posts,
-    )
+    try:
+        from app.services.ai_content import generate_social_calendar as gen_fn
+        items = gen_fn(
+            business_name=client.business_name,
+            niche=client.industry,
+            brand_voice=client.brand_voice,
+            goals=", ".join(client.goals or []),
+            city=client.city or "",
+            start_date=start,
+            num_posts=num_posts,
+        )
+    except Exception as e:
+        print(f"Generate error: {e}")
+        from app.services.ai_content import _fallback
+        items = _fallback(start, num_posts, client.business_name)
+
     for item in items:
-        db.add(SocialPost(
-            client_id=client_id,
-            post_date=datetime.strptime(item["post_date"], "%Y-%m-%d").date(),
-            post_type=item.get("post_type", "Static"),
-            platforms=item.get("platforms", ["instagram"]),
-            topic=item.get("topic", ""),
-            cover_text=item.get("cover_text", ""),
-            image_text=item.get("image_text", ""),
-            caption=item.get("caption", ""),
-            reference_note=item.get("reference_note", ""),
-            content_angle=item.get("content_angle", ""),
-            status="draft",
-        ))
+        try:
+            db.add(SocialPost(
+                client_id=client_id,
+                post_date=datetime.strptime(item["post_date"], "%Y-%m-%d").date(),
+                post_type=item.get("post_type", "Static"),
+                platforms=item.get("platforms", ["instagram"]),
+                topic=item.get("topic", ""),
+                cover_text=item.get("cover_text", ""),
+                image_text=item.get("image_text", ""),
+                caption=item.get("caption", ""),
+                reference_note=item.get("reference_note", ""),
+                content_angle=item.get("content_angle", ""),
+                status="draft",
+            ))
+        except Exception as e:
+            print(f"Post insert error: {e}")
     db.commit()
     return RedirectResponse(f"/clients/{client_id}/social", status_code=303)
 
